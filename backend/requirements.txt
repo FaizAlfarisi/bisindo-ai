@@ -5,3 +5,5 @@ python-dotenv==1.0.1
 pydantic-settings==2.2.1
 torch==2.2.1
 numpy==1.26.4
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
