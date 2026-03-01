@@ -11,8 +11,10 @@ import PracticePage from './pages/PracticePage';
 import TestPage from './pages/TestPage';
 import HistoryPage from './pages/HistoryPage';
 
-// Layout component (to be created next)
+// Layout component
 import Layout from './components/Layout'; 
+// AuthGuard component
+import AuthGuard from './components/AuthGuard'; // Added AuthGuard import
 
 function App() {
   return (
@@ -21,13 +23,19 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="learn" element={<LearnPage />} />
-        <Route path="learn/:letter" element={<LearnDetailPage />} />
-        <Route path="practice/:letter" element={<PracticePage />} />
-        <Route path="test" element={<TestPage />} />
-        <Route path="history" element={<HistoryPage />} />
+        
+        {/* Protected Routes */}
+        <Route element={<AuthGuard />}> {/* Wrap protected routes with AuthGuard */}
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="learn" element={<LearnPage />} />
+          <Route path="learn/:letter" element={<LearnDetailPage />} />
+          <Route path="practice/:letter" element={<PracticePage />} />
+          <Route path="test" element={<TestPage />} />
+          <Route path="history" element={<HistoryPage />} />
+        </Route>
       </Route>
+      {/* Optionally add a 404 Not Found page */}
+      {/* <Route path="*" element={<NotFoundPage />} /> */}
     </Routes>
   );
 }
