@@ -3,9 +3,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import timedelta
+import os # Added for model path
 
 from .app.database import create_db_and_tables, get_db
 from .app import models, schemas, auth
+from .app.ai.model import load_bisindo_model, predict_letter # Added AI model imports
 
 app = FastAPI()
 
@@ -23,10 +25,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- AI Model Path ---
+# Assuming bisindo_model.pth is in backend/app/ai/
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "app", "ai", "bisindo_model.pth")
+
 # --- Database Startup Event ---
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
+    # Load AI model on startup
+    try:
+        load_bisindo_model(MODEL_PATH)
+    except FileNotFoundError as e:
+        print(f"Error loading model: {e}. Please ensure bisindo_model.pth is in backend/app/ai/")
+        # Optionally, you might want to exit or disable AI functionality here
+    except Exception as e:
+        print(f"An unexpected error occurred while loading the AI model: {e}")
 
 # --- Auth Endpoints ---
 @app.post("/api/auth/register", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
@@ -62,10 +76,22 @@ def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
     return current_user
 
 # --- Placeholder Endpoints ---
-@app.post("/api/predict")
-def predict_sign_language():
-    # This will be implemented in Phase 4
-    return {"message": "Prediction endpoint - To be implemented"}
+# --- AI Prediction Endpoint ---
+@app.post("/api/predict", response_model=schemas.PredictionResult)
+def predict_sign_language(data: schemas.LandmarkData):
+    try:
+        predicted_letter, confidence = predict_letter(data.landmarks)
+        return {"letter": predicted_letter, "confidence": confidence}
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Prediction failed: {e}"
+        )
 
 @app.get("/api/progress", response_model=list[schemas.UserProgressResponse])
 def get_user_progress(current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):

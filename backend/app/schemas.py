@@ -57,3 +57,12 @@ class TestHistoryResponse(TestHistoryBase):
 
     class Config:
         from_attributes = True
+
+# --- AI Prediction Schemas ---
+class LandmarkData(BaseModel):
+    landmarks: list[float] # Expecting flattened 21*3 = 63 landmarks
+
+class PredictionResult(BaseModel):
+    letter: str
+    confidence: float
+
