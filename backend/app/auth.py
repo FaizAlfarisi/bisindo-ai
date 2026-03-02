@@ -24,9 +24,12 @@ class Settings(BaseSettings):
     secret_key: str = os.getenv("SECRET_KEY", "SECURE_DEV_KEY_REPLACE_IN_PROD_998877665544332211") 
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 # 24 hours
+    database_url: Optional[str] = None
+    frontend_url: Optional[str] = "*"
 
     class Config:
         env_file = ".env"
+        extra = "allow" # Allow extra environment variables without crashing
 
 settings = Settings()
 
