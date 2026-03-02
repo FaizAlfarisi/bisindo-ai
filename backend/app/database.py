@@ -1,29 +1,38 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from dotenv import load_dotenv
 
-# Use relative import for Base from models.py
-# Assuming models.py is in the same directory as database.py
-from .models import Base 
+# Load environment variables from .env file
+load_dotenv()
 
-# SQLite database URL
-DATABASE_URL = "sqlite:///./bisindo.db"
+# Get Database URL from environment variable
+# PostgreSQL format: postgresql://user:password@host:port/dbname
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./bisindo.db")
 
-# Create the SQLAlchemy engine
-# connect_args={"check_same_thread": False} is needed for SQLite with FastAPI
-engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}
-)
+# Fix for Supabase/Render: SQLAlchemy requires 'postgresql://' instead of 'postgres://'
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Create a SessionLocal class
-# This will be the actual database session
+# SQLAlchemy connection arguments
+# SQLite needs check_same_thread: False, but PostgreSQL doesn't
+connect_args = {}
+if DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
+
+# Create engine
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
+
+# Create SessionLocal
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Function to create all tables
+# Function to get the metadata base (we'll import Base from models)
 def create_db_and_tables():
+    from .models import Base
     Base.metadata.create_all(engine)
 
-# Dependency to get the database session
+# Dependency
 def get_db():
     db = SessionLocal()
     try:

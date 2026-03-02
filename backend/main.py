@@ -10,13 +10,26 @@ from app.database import create_db_and_tables, get_db
 from app import models, schemas, auth
 from app.ai.model import load_bisindo_model, predict_letter 
 
-app = FastAPI()
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
+app = FastAPI(
+    title="BISINDO AI API",
+    description="Real-time Sign Language Recognition API powered by PyTorch and MediaPipe",
+    version="1.0.0"
+)
+
+# Security: Only allow specific hosts
+app.add_middleware(
+    TrustedHostMiddleware, 
+    allowed_hosts=["localhost", "127.0.0.1", "*.onrender.com", "*.vercel.app"]
+)
 
 # Configure CORS
 origins = [
     "http://localhost",
     "http://localhost:5173", 
-    "http://127.0.0.1:5173", 
+    "http://127.0.0.1:5173",
+    os.getenv("FRONTEND_URL", "*"), # Allow Vercel URL from Env Var
 ]
 
 app.add_middleware(

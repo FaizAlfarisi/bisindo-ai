@@ -21,9 +21,9 @@ load_dotenv()
 
 # Define a Settings class to manage configurations
 class Settings(BaseSettings):
-    secret_key: str = os.getenv("SECRET_KEY", "your-super-secret-default-key-for-dev") # Provide a default for dev if not set
+    secret_key: str = os.getenv("SECRET_KEY", "SECURE_DEV_KEY_REPLACE_IN_PROD_998877665544332211") 
     algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
+    access_token_expire_minutes: int = 60 * 24 # 24 hours
 
     class Config:
         env_file = ".env"
