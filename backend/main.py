@@ -1,20 +1,22 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, WebSocket, WebSocketDisconnect, Query
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import timedelta
-import os # Added for model path
+import os
+from jose import jwt, JWTError
 
-from .app.database import create_db_and_tables, get_db
-from .app import models, schemas, auth
-from .app.ai.model import load_bisindo_model, predict_letter # Added AI model imports
+from app.database import create_db_and_tables, get_db
+from app import models, schemas, auth
+from app.ai.model import load_bisindo_model, predict_letter 
 
 app = FastAPI()
 
 # Configure CORS
 origins = [
     "http://localhost",
-    "http://localhost:5173", # Default Vite port for development
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173", 
 ]
 
 app.add_middleware(
@@ -26,21 +28,68 @@ app.add_middleware(
 )
 
 # --- AI Model Path ---
-# Assuming bisindo_model.pth is in backend/app/ai/
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "app", "ai", "bisindo_model.pth")
 
 # --- Database Startup Event ---
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
-    # Load AI model on startup
     try:
         load_bisindo_model(MODEL_PATH)
-    except FileNotFoundError as e:
-        print(f"Error loading model: {e}. Please ensure bisindo_model.pth is in backend/app/ai/")
-        # Optionally, you might want to exit or disable AI functionality here
     except Exception as e:
-        print(f"An unexpected error occurred while loading the AI model: {e}")
+        print(f"Error loading model: {e}")
+
+# --- WebSocket Endpoint for Real-time Prediction ---
+@app.websocket("/ws/predict")
+async def websocket_predict(websocket: WebSocket, token: str = Query(None)):
+    # 1. Authenticate BEFORE accepting the connection
+    if not token:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+        
+    try:
+        payload = jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
+        username: str = payload.get("sub")
+        if not username:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+    except JWTError:
+        # Deny connection if token is invalid or expired
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
+    # 2. Accept connection only if authenticated
+    await websocket.accept()
+
+    # 2. Continuous listening and predicting loop
+    try:
+        while True:
+            # Wait for data from frontend
+            try:
+                data = await websocket.receive_json()
+                hands = data.get("hands", [])
+                
+                if not hands:
+                    # Clear prediction if no hands sent
+                    await websocket.send_json({"letter": "Unknown", "confidence": 0.0})
+                    continue
+
+                # Predict
+                predicted_letter, confidence = predict_letter(hands)
+                
+                # Send result back immediately
+                await websocket.send_json({
+                    "letter": predicted_letter, 
+                    "confidence": confidence
+                })
+            except Exception as e:
+                print(f"Prediction error: {e}")
+                await websocket.send_json({"letter": "Error", "confidence": 0.0, "error": str(e)})
+                
+    except WebSocketDisconnect:
+        print("WebSocket Client disconnected")
+    except Exception as e:
+        print(f"WebSocket Loop Fatal Error: {e}")
 
 # --- Auth Endpoints ---
 @app.post("/api/auth/register", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
@@ -80,7 +129,7 @@ def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
 @app.post("/api/predict", response_model=schemas.PredictionResult)
 def predict_sign_language(data: schemas.LandmarkData):
     try:
-        predicted_letter, confidence = predict_letter(data.landmarks)
+        predicted_letter, confidence = predict_letter(data.hands)
         return {"letter": predicted_letter, "confidence": confidence}
     except RuntimeError as e:
         raise HTTPException(

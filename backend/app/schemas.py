@@ -59,8 +59,12 @@ class TestHistoryResponse(TestHistoryBase):
         from_attributes = True
 
 # --- AI Prediction Schemas ---
+class HandData(BaseModel):
+    label: str # 'Left' or 'Right'
+    landmarks: list[list[float]] # 21 elements, each [x, y, z]
+
 class LandmarkData(BaseModel):
-    landmarks: list[float] # Expecting flattened 21*3 = 63 landmarks
+    hands: list[HandData]
 
 class PredictionResult(BaseModel):
     letter: str

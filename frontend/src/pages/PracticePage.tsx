@@ -1,194 +1,140 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import useWebcamAndHandDetection from '../hooks/useWebcamAndHandDetection';
+import { usePredictionWebSocket } from '../hooks/usePredictionWebSocket';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const PracticePage = () => {
   const { letter } = useParams<{ letter: string }>();
-  const [prediction, setPrediction] = useState<{ letter: string; confidence: number } | null>(null);
-  const [loadingPrediction, setLoadingPrediction] = useState(false);
-  const [predictionError, setPredictionError] = useState<string | null>(null);
-  const [progressSaved, setProgressSaved] = useState(false); // To track if progress was just saved
-
-  // Ref to store last successful confidence to prevent repeated saves
+  const [progressSaved, setProgressSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const lastSavedConfidenceRef = useRef<number>(0); 
+
+  const { prediction, wsError, isWsReady, sendLandmarks, setPrediction } = usePredictionWebSocket();
 
   const saveProgress = useCallback(async (currentLetter: string, confidence: number, isMastered: boolean) => {
     const token = localStorage.getItem('access_token');
-    if (!token) {
-      console.warn("Cannot save progress: Authentication token not found.");
-      return;
-    }
-
+    if (!token || isSaving) return;
+    setIsSaving(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/progress`, {
+      await fetch(`${API_BASE_URL}/api/progress`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          letter: currentLetter,
-          highest_confidence: confidence,
-          is_mastered: isMastered
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ letter: currentLetter, highest_confidence: confidence, is_mastered: isMastered })
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to save progress.');
-      }
-      
-      setProgressSaved(true); // Indicate success
-      lastSavedConfidenceRef.current = confidence; // Update ref with current confidence
-      console.log(`Progress saved for ${currentLetter}: Confidence ${confidence.toFixed(2)}, Mastered: ${isMastered}`);
-
+      setProgressSaved(true);
+      lastSavedConfidenceRef.current = confidence;
     } catch (err) {
       console.error("Error saving progress:", err);
-      // Optionally show a user-facing error for saving progress
-    }
-  }, []);
-
-  const onNewLandmarks = useCallback(async (landmarks: { x: number; y: number; z: number }[][]) => {
-    if (landmarks.length === 0) {
-      setPrediction(null);
-      return;
-    }
-
-    const singleHandLandmarks = landmarks[0]; // Take the first detected hand
-    const flattenedLandmarks = singleHandLandmarks.flatMap(lm => [lm.x, lm.y, lm.z]);
-
-    setLoadingPrediction(true);
-    setPredictionError(null);
-
-    try {
-      const token = localStorage.getItem('access_token'); // Get token from localStorage
-      if (!token) {
-        setPredictionError("Authentication token not found. Please log in.");
-        setLoadingPrediction(false);
-        return;
-      }
-
-      const response = await fetch(`${API_BASE_URL}/api/predict`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Attach JWT token
-        },
-        body: JSON.stringify({ landmarks: flattenedLandmarks })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to get prediction from AI.');
-      }
-
-      const data = await response.json();
-      setPrediction(data);
-
-      // --- New: Logic to save progress ---
-      if (letter && data.letter === letter.toUpperCase()) {
-        if (data.confidence >= 0.6 && data.confidence > lastSavedConfidenceRef.current) {
-          // If confidence is good and higher than last saved, save progress
-          const isMastered = data.confidence >= 0.8;
-          saveProgress(letter.toUpperCase(), data.confidence, isMastered);
-        }
-      }
-      // --- End new logic ---
-
-    } catch (err: any) {
-      console.error("Error sending landmarks to API:", err);
-      setPredictionError(err.message || "Failed to get prediction from AI. Please try again.");
     } finally {
-      setLoadingPrediction(false);
+      setIsSaving(false);
     }
-  }, [letter, saveProgress]);
-
-
-  // Reset progressSaved state when target letter changes
-  useEffect(() => {
-    setProgressSaved(false);
-    lastSavedConfidenceRef.current = 0; // Reset last saved confidence for new letter
-  }, [letter]);
-
-
-  const {
-    videoRef,
-    canvasRef,
-    isHandLandmarkerLoaded,
-    error: webcamError,
-    startDetection,
-    stopDetection,
-  } = useWebcamAndHandDetection(onNewLandmarks, 150); // Throttle to ~6-7 FPS (150ms)
+  }, [isSaving]);
 
   useEffect(() => {
-    if (isHandLandmarkerLoaded) {
-      startDetection();
+    if (prediction && letter && prediction.letter === letter.toUpperCase()) {
+      if (prediction.confidence >= 0.6 && prediction.confidence > lastSavedConfidenceRef.current) {
+        saveProgress(letter.toUpperCase(), prediction.confidence, prediction.confidence >= 0.8);
+      }
     }
+  }, [prediction, letter, saveProgress]);
 
-    return () => {
-      stopDetection();
-    };
+  const onNewLandmarks = useCallback((handsData: any) => sendLandmarks(handsData), [sendLandmarks]);
+  const { videoRef, canvasRef, isHandLandmarkerLoaded, error: webcamError, startDetection, stopDetection } = useWebcamAndHandDetection(onNewLandmarks, 150);
+
+  useEffect(() => {
+    if (isHandLandmarkerLoaded) startDetection();
+    return () => stopDetection();
   }, [isHandLandmarkerLoaded, startDetection, stopDetection]);
 
-  const displayLetter = letter ? letter.toUpperCase() : 'Letter';
-
-  const getFeedbackStyles = useCallback(() => {
-    if (!prediction || !letter) {
-      return "bg-gray-200 text-gray-800"; // Default style
-    }
-    const isCorrectLetter = prediction.letter === letter.toUpperCase();
-    if (isCorrectLetter && prediction.confidence >= 0.8) {
-      return "bg-green-500 text-white"; // Strong correct
-    } else if (isCorrectLetter && prediction.confidence >= 0.6) {
-      return "bg-yellow-400 text-gray-800"; // Weak correct
-    } else {
-      return "bg-red-500 text-white"; // Incorrect or low confidence
-    }
-  }, [prediction, letter]);
-
+  const displayLetter = letter ? letter.toUpperCase() : '';
+  const isCorrect = prediction?.letter === displayLetter;
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-gray-100 text-gray-800 p-4">
-      <h1 className="text-4xl font-bold mb-4">Practice: {displayLetter}</h1>
-      <p className="text-lg mb-4">Realtime practice with camera.</p>
+    <div className="bg-gray-50/50 min-h-screen">
+      <div className="container mx-auto px-6 py-12 max-w-6xl">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+           <div>
+              <Link to="/learn" className="text-blue-600 font-black hover:text-blue-800 transition-colors mb-2 inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Modules
+              </Link>
+              <h1 className="text-5xl font-black text-gray-900 tracking-tight">Practice: <span className="text-blue-600">{displayLetter}</span></h1>
+           </div>
+           
+           <div className="flex items-center space-x-3">
+              <div className={`px-4 py-2 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center ${isWsReady ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                <div className={`w-2 h-2 rounded-full mr-2 ${isWsReady ? 'bg-green-500 animate-pulse' : 'bg-orange-500'}`}></div>
+                {isWsReady ? 'AI Online' : 'Connecting AI...'}
+              </div>
+              <div className={`px-4 py-2 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center ${isHandLandmarkerLoaded ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'}`}>
+                <div className={`w-2 h-2 rounded-full mr-2 ${isHandLandmarkerLoaded ? 'bg-blue-500 animate-pulse' : 'bg-gray-400'}`}></div>
+                {isHandLandmarkerLoaded ? 'Camera Ready' : 'Loading Vision...'}
+              </div>
+           </div>
+        </div>
 
-      {webcamError && <p className="text-red-500 text-center mb-4">{webcamError}</p>}
-      {!isHandLandmarkerLoaded && !webcamError && (
-        <p className="text-blue-500 text-center mb-4">Loading hand detection model...</p>
-      )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+           <div className="lg:col-span-2 relative aspect-video bg-white rounded-[2.5rem] overflow-hidden shadow-2xl shadow-gray-200 border border-gray-100">
+              <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover transform scaleX(-1)"></video>
+              <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full object-cover transform scaleX(-1)"></canvas>
+              {!isHandLandmarkerLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-sm">
+                   <div className="text-center">
+                      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                      <p className="font-black text-gray-500 uppercase tracking-widest text-xs">Initializing AI Vision...</p>
+                   </div>
+                </div>
+              )}
+           </div>
 
-      <div className="relative w-full max-w-2xl bg-black rounded-lg shadow-lg overflow-hidden mb-4">
-        <video ref={videoRef} autoPlay playsInline className="w-full h-auto transform scaleX(-1)"></video>
-        <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full transform scaleX(-1)"></canvas>
+           <div className="space-y-6">
+              <div className={`p-8 rounded-[2.5rem] transition-all duration-500 border ${isCorrect ? 'bg-green-500 border-green-600 shadow-xl shadow-green-100' : 'bg-white border-gray-100 shadow-xl shadow-gray-200/50'}`}>
+                 <h2 className={`text-xs font-black uppercase tracking-widest mb-8 ${isCorrect ? 'text-white/80' : 'text-gray-400'}`}>Live Analysis</h2>
+                 {prediction ? (
+                   <div className="space-y-6">
+                      <div>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${isCorrect ? 'text-white/60' : 'text-gray-400'}`}>Current Gesture</span>
+                        <span className={`text-8xl font-black block mt-1 ${isCorrect ? 'text-white' : 'text-gray-900'}`}>{prediction.letter}</span>
+                      </div>
+                      <div>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${isCorrect ? 'text-white/60' : 'text-gray-400'}`}>Accuracy</span>
+                        <div className="flex items-center space-x-4 mt-2">
+                           <div className={`flex-1 h-3 rounded-full overflow-hidden ${isCorrect ? 'bg-white/20' : 'bg-gray-100'}`}>
+                              <div className={`h-full transition-all duration-300 ${isCorrect ? 'bg-white' : 'bg-blue-600'}`} style={{ width: `${prediction.confidence * 100}%` }}></div>
+                           </div>
+                           <span className={`font-black text-xl ${isCorrect ? 'text-white' : 'text-gray-900'}`}>{(prediction.confidence * 100).toFixed(0)}%</span>
+                        </div>
+                      </div>
+                   </div>
+                 ) : (
+                   <div className="py-12 text-center text-gray-400 font-bold text-sm leading-relaxed">
+                      Position your hand in the view to see results.
+                   </div>
+                 )}
+              </div>
+
+              {isCorrect && prediction.confidence >= 0.8 && (
+                <div className="bg-blue-600 p-8 rounded-[2.5rem] shadow-xl shadow-blue-200 flex items-center justify-between group">
+                   <div>
+                     <h3 className="text-2xl font-black text-white">Perfect Form!</h3>
+                     <p className="text-blue-100 font-bold text-sm">Mastery achieved for {displayLetter}</p>
+                   </div>
+                   <div className="text-4xl animate-bounce">🌟</div>
+                </div>
+              )}
+
+              {progressSaved && (
+                <div className="bg-green-50 p-6 rounded-3xl border border-green-100 text-center font-black text-green-600 text-xs uppercase tracking-widest">
+                   Progress Saved Successfully
+                </div>
+              )}
+           </div>
+        </div>
       </div>
-
-      <div className="text-center">
-        {loadingPrediction && <p className="text-gray-600">Sending to AI for prediction...</p>}
-        {predictionError && <p className="text-red-500">{predictionError}</p>}
-        {prediction && (
-          <p className="text-2xl font-semibold">
-            AI Predicts: <span className="text-green-600">{prediction.letter}</span> (Confidence: {(prediction.confidence * 100).toFixed(2)}%)
-          </p>
-        )}
-      </div>
-
-      <div className={`mt-4 p-4 rounded shadow ${getFeedbackStyles()} transition-colors duration-300 w-full max-w-sm`}>
-        <h2 className="text-2xl font-bold text-center mb-2">Target: {displayLetter}</h2>
-        {prediction && (
-          <p className="text-xl text-center">
-            You are signing: <span className="font-semibold">{prediction.letter}</span> ({(prediction.confidence * 100).toFixed(1)}%)
-          </p>
-        )}
-        {prediction && prediction.letter === displayLetter && prediction.confidence >= 0.8
-          ? <p className="text-center font-bold text-lg mt-2">Correct!</p>
-          : <p className="text-center font-bold text-lg mt-2">Keep trying!</p>}
-      </div>
-      {progressSaved && (
-        <p className="text-green-600 text-sm mt-2">Progress updated successfully!</p>
-      )}
-
     </div>
   );
 };

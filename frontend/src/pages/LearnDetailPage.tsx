@@ -1,75 +1,103 @@
 import { useParams, Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-
-// Placeholder data for letter details
-const letterDetails: { [key: string]: { description: string; imageUrl: string } } = {
-  a: { description: "Place your hand open, palm facing forward, thumb extended out to the side.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+A" },
-  b: { description: "Hold your hand up, palm forward, all fingers together and pointing up.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+B" },
-  c: { description: "Curve your hand to form a 'C' shape, palm facing forward.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+C" },
-  d: { description: "Index finger and thumb form a circle, other fingers extended up.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+D" },
-  e: { description: "Fingers curled inward, thumb tucked in.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+E" },
-  f: { description: "Index finger and thumb touch, other three fingers extended.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+F" },
-  g: { description: "Hand closed, index finger pointing to the side, thumb extended.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+G" },
-  h: { description: "Index and middle fingers extended side-by-side, thumb tucked.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+H" },
-  i: { description: "Pinky finger extended upwards, other fingers closed.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+I" },
-  j: { description: "Pinky finger extended, drawing a 'J' shape in the air.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+J" },
-  k: { description: "Index and middle fingers extended up, middle finger bent at knuckle, thumb between them.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+K" },
-  l: { description: "Thumb extended up, index finger extended forward, forming an 'L' shape.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+L" },
-  m: { description: "Three fingers (index, middle, ring) over the thumb.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+M" },
-  n: { description: "Two fingers (index, middle) over the thumb.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+N" },
-  o: { description: "Fingers and thumb form a circle, resembling an 'O'.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+O" },
-  p: { description: "Similar to 'K', but index finger points down.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+P" },
-  q: { description: "Similar to 'G', but index finger points down.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+Q" },
-  r: { description: "Index and middle fingers crossed.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+R" },
-  s: { description: "Hand closed in a fist, thumb over the fingers.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+S" },
-  t: { description: "Hand closed, thumb between index and middle fingers.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+T" },
-  u: { description: "Index and middle fingers extended straight up, together.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+U" },
-  v: { description: "Index and middle fingers extended up, spread apart, forming a 'V'.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+V" },
-  w: { description: "Three fingers (index, middle, ring) extended up, spread apart.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+W" },
-  x: { description: "Index finger bent at the knuckle, resembling a hook.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+X" },
-  y: { description: "Thumb and pinky finger extended, other fingers closed.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+Y" },
-  z: { description: "Index finger drawing a 'Z' shape in the air.", imageUrl: "https://via.placeholder.com/300x200?text=Sign+for+Z" },
-};
+import { BISINDO_ALPHABET } from '../data/bisindoData';
 
 const LearnDetailPage = () => {
   const { letter } = useParams<{ letter: string }>();
-  const displayLetter = letter ? letter.toUpperCase() : '';
-  const [details, setDetails] = useState<{ description: string; imageUrl: string } | null>(null);
+  const letterData = letter ? BISINDO_ALPHABET[letter.toUpperCase()] : null;
 
-  useEffect(() => {
-    if (letter) {
-      setDetails(letterDetails[letter.toLowerCase()] || { description: "Details not available for this letter.", imageUrl: "https://via.placeholder.com/300x200?text=No+Image" });
-    } else {
-      setDetails(null);
-    }
-  }, [letter]);
-
-  if (!letter || !details) {
+  if (!letterData) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-800">
-        <h1 className="text-4xl font-bold mb-4">Letter Not Found</h1>
-        <p className="text-lg">Please select a valid letter from the learning grid.</p>
-        <Link to="/learn" className="mt-4 text-blue-500 hover:underline">Go back to Learn</Link>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">Letter Not Found</h1>
+        <p className="text-gray-600 mb-8 text-center max-w-md">The letter you're looking for isn't in our current BISINDO alphabet database.</p>
+        <Link to="/learn" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg">
+          Back to Learning Module
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-gray-100 text-gray-800 p-4">
-      <h1 className="text-4xl font-bold mb-6">Learn: {displayLetter}</h1>
-      
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg text-center">
-        <img src={details.imageUrl} alt={`Sign for ${displayLetter}`} className="mx-auto mb-4 rounded-lg" />
-        <p className="text-lg mb-4">{details.description}</p>
-        <Link
-          to={`/practice/${letter}`}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Start Practice for {displayLetter}
-        </Link>
+    <div className="bg-gray-50/50 min-h-screen">
+      <div className="container mx-auto px-4 py-12 max-w-5xl">
+        <div className="flex items-center space-x-4 mb-10">
+          <Link to="/learn" className="p-3 rounded-2xl hover:bg-gray-200 transition-all text-gray-600 bg-white shadow-sm border border-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
+          <div>
+            <h1 className="text-4xl font-black text-gray-900 leading-none tracking-tight">Learn Letter {letterData.letter}</h1>
+            <p className="text-gray-500 mt-1 font-bold uppercase tracking-widest text-xs">BISINDO Abjad Indonesia</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Visual Reference Section (3 columns) */}
+          <div className="lg:col-span-3">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-center">
+              <div className="w-full aspect-video bg-white rounded-3xl flex items-center justify-center mb-8 relative group overflow-hidden border border-gray-50">
+                <img 
+                  src={letterData.imagePath} 
+                  alt={`BISINDO ${letterData.letter}`} 
+                  className="w-full h-full object-contain relative z-10 transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute bottom-6 right-6 z-30">
+                  <div className="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black shadow-xl uppercase tracking-widest">
+                     {letterData.category}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-center px-4 max-w-md">
+                <h4 className="text-xs font-black text-blue-600 uppercase tracking-widest mb-3">Core Characteristic</h4>
+                <p className="text-3xl font-black text-gray-900 leading-tight">
+                  "{letterData.description}"
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Instructions Section (2 columns) */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100">
+              <h2 className="text-2xl font-black mb-8 flex items-center text-gray-900">
+                <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2h2a2 2 0 002 2" />
+                  </svg>
+                </div>
+                How to Form It
+              </h2>
+              <ol className="space-y-6">
+                {letterData.steps.map((step, index) => (
+                  <li key={index} className="flex items-start group">
+                    <span className="flex-shrink-0 w-8 h-8 bg-gray-50 text-blue-600 border border-blue-100 rounded-xl flex items-center justify-center text-sm font-black mr-4 shadow-sm group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all">
+                      {index + 1}
+                    </span>
+                    <span className="text-gray-600 font-bold leading-relaxed">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="bg-amber-50/50 border border-amber-100 p-8 rounded-[2rem]">
+              <h3 className="text-sm font-black text-amber-900 mb-2 uppercase tracking-widest flex items-center">
+                <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
+                Pro Tip
+              </h3>
+              <p className="text-amber-800 font-bold leading-relaxed">{letterData.tips}</p>
+            </div>
+
+            <Link 
+              to={`/practice/${letterData.letter.toLowerCase()}`}
+              className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-5 rounded-3xl font-black text-xl shadow-xl shadow-blue-200 transition-all hover:scale-[1.03] active:scale-[0.97]"
+            >
+              Start Practice Now
+            </Link>
+          </div>
+        </div>
       </div>
-      
-      <Link to="/learn" className="mt-6 text-blue-500 hover:underline">Back to All Letters</Link>
     </div>
   );
 };
