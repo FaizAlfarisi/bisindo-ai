@@ -4,7 +4,7 @@ export interface BisindoLetter {
   category: 'One Hand' | 'Two Hands';
   steps: string[];
   tips: string;
-  imagePath: string; // Added image path
+  imagePath: string;
 }
 
 export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
@@ -22,19 +22,19 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'B': {
     letter: 'B',
-    description: 'Telapak tangan kiri terbuka tegak, telapak tangan kanan menempel rata di depannya.',
+    description: 'Telunjuk kiri tegak lurus dengan tiga jari horizontal tangan kanan melintang di depannya.',
     category: 'Two Hands',
     steps: [
-      'Buka telapak tangan kiri tegak lurus menghadap ke kanan.',
-      'Buka telapak tangan kanan tegak lurus menghadap ke kiri.',
-      'Tempelkan telapak tangan kanan ke telapak tangan kiri.'
+      'Tangan kiri: Angkat telunjuk tegak lurus ke atas.',
+      'Tangan kanan: Rentangkan tiga jari (telunjuk, tengah, manis) secara horizontal.',
+      'Letakkan tiga jari tangan kanan melintang di depan telunjuk kiri.'
     ],
-    tips: 'Ini menyerupai bentuk perut huruf B yang menempel pada garis tegak.',
+    tips: 'Bentuk menyerupai garis vertikal dan tiga garis horizontal pada huruf B.',
     imagePath: '/images/bisindo/b.jpg'
   },
   'C': {
     letter: 'C',
-    description: 'Tangan dominan membentuk lengkungan huruf C.',
+    description: 'Tangan dominan membentuk lengkungan terbuka menyerupai huruf C.',
     category: 'One Hand',
     steps: [
       'Gunakan tangan kanan.',
@@ -45,43 +45,42 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'D': {
     letter: 'D',
-    description: 'Telunjuk kiri menunjuk ke atas, telunjuk dan jempol kanan membentuk lingkaran yang menempel pada telunjuk kiri.',
+    description: 'Telunjuk kiri tegak dengan lengkungan besar tangan kanan menempel di sisi kanannya.',
     category: 'Two Hands',
     steps: [
-      'Tangan kiri: Angkat telunjuk tegak ke atas.',
-      'Tangan kanan: Pertemukan ujung jempol and telunjuk membentuk lingkaran.',
-      'Tempelkan lingkaran tangan kanan ke batang telunjuk kiri.'
+      'Tangan kiri: Angkat telunjuk tegak lurus ke atas.',
+      'Tangan kanan: Bentuk lengkungan besar menyerupai huruf C.',
+      'Tempelkan lengkungan tersebut di sisi kanan telunjuk kiri.'
     ],
-    tips: 'Bentuk ini secara visual menyerupai huruf d kecil.',
+    tips: 'Lengkungan harus terlihat jelas sebagai bagian bulat huruf D.',
     imagePath: '/images/bisindo/d.jpg'
   },
   'E': {
     letter: 'E',
-    description: 'Jari-jari menekuk sedikit ke depan menyerupai bentuk e kecil.',
+    description: 'Tiga jari tangan kanan direntangkan secara horizontal untuk melambangkan bentuk E.',
     category: 'One Hand',
     steps: [
       'Gunakan tangan kanan.',
-      'Tekuk semua jari ke arah telapak tangan namun jangan mengepal rapat.',
-      'Posisikan jempol melintang di bawah jari-jari yang menekuk.'
+      'Rentangkan tiga jari (telunjuk, tengah, manis) secara horizontal.'
     ],
-    tips: 'Bayangkan Anda sedang memegang benda kecil berbentuk bulat.',
+    tips: 'Tiga garis horizontal melambangkan bentuk huruf E.',
     imagePath: '/images/bisindo/e.jpg'
   },
   'F': {
     letter: 'F',
-    description: 'Telunjuk dan jari tengah kiri menunjuk ke atas, telunjuk dan jari tengah kanan diletakkan melintang di atasnya.',
+    description: 'Telunjuk kiri tegak dengan dua jari tangan kanan melintang di bagian atasnya.',
     category: 'Two Hands',
     steps: [
-      'Tangan kiri: Angkat telunjuk dan jari tengah tegak ke atas.',
-      'Tangan kanan: Angkat telunjuk dan jari tengah, lalu letakkan melintang di atas jari-jari kiri.',
-      'Pastikan posisi tangan kanan berada di bagian atas jari kiri.'
+      'Tangan kiri: Angkat telunjuk tegak lurus.',
+      'Tangan kanan: Rentangkan telunjuk dan jari tengah secara horizontal.',
+      'Letakkan dua jari kanan di bagian atas telunjuk kiri.'
     ],
-    tips: 'Bentuk ini menyerupai dua garis horizontal pada huruf F.',
+    tips: 'Membentuk garis atas huruf F.',
     imagePath: '/images/bisindo/f.jpg'
   },
   'G': {
     letter: 'G',
-    description: 'Kedua tangan mengepal dan ditumpuk (tangan kanan di atas tangan kiri).',
+    description: 'Kedua tangan mengepal dan ditumpuk secara vertikal.',
     category: 'Two Hands',
     steps: [
       'Kepalkan kedua tangan.',
@@ -92,18 +91,19 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'H': {
     letter: 'H',
-    description: 'Telapak tangan kiri terbuka menghadap atas, telunjuk dan jari tengah kanan diletakkan di atas telapak kiri.',
+    description: 'Dua jari telunjuk ditegakkan sejajar dan berdekatan menghadap ke atas.',
     category: 'Two Hands',
     steps: [
-      'Buka telapak tangan kiri mendatar menghadap ke atas.',
-      'Gunakan telunjuk dan jari tengah kanan, letakkan mendatar di atas telapak kiri.'
+      'Angkat kedua tangan.',
+      'Tegakkan kedua telunjuk sejajar dan berdekatan.',
+      'Pastikan kedua telunjuk menghadap ke atas.'
     ],
-    tips: 'Posisi jari kanan tegak lurus dengan telapak kiri.',
+    tips: 'Dua garis vertikal melambangkan huruf H.',
     imagePath: '/images/bisindo/h.jpg'
   },
   'I': {
     letter: 'I',
-    description: 'Jari kelingking menunjuk tegak ke atas.',
+    description: 'Jari kelingking menunjuk tegak lurus ke atas melambangkan garis lurus.',
     category: 'One Hand',
     steps: [
       'Kepalkan tangan kanan.',
@@ -114,7 +114,7 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'J': {
     letter: 'J',
-    description: 'Jari kelingking "menggambar" bentuk kail huruf J di udara.',
+    description: 'Jari kelingking mengayun di udara membentuk pola kail huruf J.',
     category: 'One Hand',
     steps: [
       'Mulai dengan posisi huruf I (kelingking atas).',
@@ -125,52 +125,55 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'K': {
     letter: 'K',
-    description: 'Telunjuk kiri menunjuk ke atas, telunjuk kanan menempel miring di tengah telunjuk kiri.',
+    description: 'Telunjuk kiri tegak dengan sudut jari tangan kanan menempel di tengahnya.',
     category: 'Two Hands',
     steps: [
-      'Tangan kiri: Angkat telunjuk tegak ke atas.',
-      'Tangan kanan: Arahkan telunjuk kanan miring and tempelkan ujungnya ke bagian tengah telunjuk kiri.'
+      'Tangan kiri: Angkat telunjuk tegak.',
+      'Tangan kanan: Rentangkan jempol dan telunjuk membentuk sudut.',
+      'Tempelkan sudut tersebut ke tengah telunjuk kiri.'
     ],
-    tips: 'Visualisasikan garis tegak and garis miring pada huruf K.',
+    tips: 'Membentuk dua garis miring huruf K.',
     imagePath: '/images/bisindo/k.jpg'
   },
   'L': {
     letter: 'L',
-    description: 'Jempol and telunjuk membentuk sudut 90 derajat (huruf L).',
+    description: 'Jempol dan telunjuk membentuk sudut siku-siku (90 derajat) menyerupai huruf L.',
     category: 'One Hand',
     steps: [
       'Gunakan tangan kanan.',
-      'Rentangkan jempol ke samping and telunjuk ke atas.',
+      'Rentangkan jempol ke samping dan telunjuk ke atas.',
       'Tekuk jari lainnya ke dalam telapak tangan.'
     ],
-    tips: 'Pastikan sudut antara jempol and telunjuk membentuk siku-siku.',
+    tips: 'Pastikan sudut antara jempol dan telunjuk membentuk siku-siku.',
     imagePath: '/images/bisindo/l.jpg'
   },
   'M': {
     letter: 'M',
-    description: 'Telapak tangan kiri terbuka menghadap bawah, tiga jari kanan diletakkan di punggung tangan kiri.',
+    description: 'Dua jari tangan kanan ditempelkan pada telapak kiri yang terbuka untuk membentuk tiga puncak.',
     category: 'Two Hands',
     steps: [
-      'Buka telapak tangan kiri mendatar menghadap ke bawah.',
-      'Letakkan ujung jari telunjuk, tengah, dan manis tangan kanan di atas punggung tangan kiri.'
+      'Tangan kiri: Buka telapak tangan menghadap depan.',
+      'Tangan kanan: Gunakan dua jari (telunjuk dan tengah).',
+      'Tempelkan dua jari tersebut di bagian tengah telapak kiri.'
     ],
-    tips: 'Tiga jari melambangkan tiga kaki pada huruf M.',
+    tips: 'Visual membentuk tiga puncak huruf M.',
     imagePath: '/images/bisindo/m.jpg'
   },
   'N': {
     letter: 'N',
-    description: 'Telapak tangan kiri terbuka menghadap bawah, dua jari kanan diletakkan di punggung tangan kiri.',
+    description: 'Satu jari telunjuk kanan ditempelkan pada tengah telapak tangan kiri yang terbuka.',
     category: 'Two Hands',
     steps: [
-      'Buka telapak tangan kiri mendatar menghadap ke bawah.',
-      'Letakkan ujung jari telunjuk dan tengah tangan kanan di atas punggung tangan kiri.'
+      'Tangan kiri: Buka telapak tangan menghadap depan.',
+      'Tangan kanan: Gunakan satu jari (telunjuk).',
+      'Tempelkan telunjuk kanan di bagian tengah telapak kiri.'
     ],
-    tips: 'Dua jari melambangkan dua kaki pada huruf N.',
+    tips: 'Satu garis diagonal melambangkan huruf N.',
     imagePath: '/images/bisindo/n.jpg'
   },
   'O': {
     letter: 'O',
-    description: 'Jari-jari membentuk lingkaran sempurna.',
+    description: 'Semua ujung jari bertemu membentuk lingkaran sempurna menyerupai huruf O.',
     category: 'One Hand',
     steps: [
       'Gunakan tangan kanan.',
@@ -181,31 +184,31 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'P': {
     letter: 'P',
-    description: 'Telunjuk kiri menunjuk ke atas, telunjuk dan jempol kanan membentuk lingkaran yang menempel di ujung atas telunjuk kiri.',
+    description: 'Telunjuk kiri tegak dengan lengkungan tangan kanan di bagian atasnya.',
     category: 'Two Hands',
     steps: [
-      'Tangan kiri: Angkat telunjuk tegak ke atas.',
-      'Tangan kanan: Pertemukan ujung jempol and telunjuk membentuk lingkaran.',
-      'Tempelkan lingkaran tersebut di bagian atas telunjuk kiri.'
+      'Tangan kiri: Angkat telunjuk tegak.',
+      'Tangan kanan: Bentuk lengkungan seperti huruf C.',
+      'Tempelkan lengkungan di bagian atas telunjuk kiri.'
     ],
-    tips: 'Mirip dengan huruf D, tapi lingkaran berada di posisi atas (menyerupai P kapital).',
+    tips: 'Menyerupai huruf P kapital.',
     imagePath: '/images/bisindo/p.jpg'
   },
   'Q': {
     letter: 'Q',
-    description: 'Kebalikan dari P, lingkaran telunjuk dan jempol kanan menempel di bagian bawah telunjuk kiri.',
+    description: 'Tangan kiri membentuk lingkaran dengan telunjuk kanan masuk ke dalamnya sebagai ekor.',
     category: 'Two Hands',
     steps: [
-      'Tangan kiri: Angkat telunjuk tegak ke atas.',
-      'Tangan kanan: Pertemukan ujung jempol and telunjuk membentuk lingkaran.',
-      'Tempelkan lingkaran tersebut di bagian bawah telunjuk kiri.'
+      'Tangan kiri: Bentuk lengkungan seperti huruf O.',
+      'Tangan kanan: Arahkan telunjuk ke dalam lengkungan tersebut.',
+      'Tempelkan ujung telunjuk di dalam lengkungan.'
     ],
-    tips: 'Visualisasikan ekor pada huruf Q yang berada di bawah.',
+    tips: 'Menyerupai huruf Q dengan ekor di dalam lingkaran.',
     imagePath: '/images/bisindo/q.jpg'
   },
   'R': {
     letter: 'R',
-    description: 'Jari telunjuk dan jari tengah disilangkan (fingers crossed).',
+    description: 'Jari telunjuk dan tengah disilangkan (crossed) untuk melambangkan jalinan huruf R.',
     category: 'One Hand',
     steps: [
       'Gunakan tangan kanan.',
@@ -216,21 +219,22 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'S': {
     letter: 'S',
-    description: 'Jari kelingking kanan dan kiri saling mengait (seperti janji kelingking).',
-    category: 'Two Hands',
+    description: 'Tangan kanan membentuk lengkungan dinamis yang mengikuti pola lekukan huruf S.',
+    category: 'One Hand',
     steps: [
-      'Angkat kedua tangan.',
-      'Kaitkan jari kelingking kanan dengan jari kelingking kiri.'
+      'Gunakan tangan kanan.',
+      'Bentuk tangan melengkung menyerupai huruf C terbalik.',
+      'Gerakkan sedikit membentuk pola S.'
     ],
-    tips: 'Ini melambangkan lekukan huruf S yang saling menyambung.',
+    tips: 'Bentuk harus terlihat seperti lekukan huruf S.',
     imagePath: '/images/bisindo/s.jpg'
   },
   'T': {
     letter: 'T',
-    description: 'Telunjuk kiri menunjuk ke atas, telunjuk kanan menempel melintang di tengah telunjuk kiri.',
+    description: 'Telunjuk kiri tegak dengan telunjuk kanan melintang tepat di tengahnya (seperti tanda tambah).',
     category: 'Two Hands',
     steps: [
-      'Tangan kiri: Angkat telunjuk tegak ke atas.',
+      'Tangan kiri: Angkat telunjuk tegak lurus ke atas.',
       'Tangan kanan: Letakkan telunjuk kanan secara horizontal (mendatar) di tengah-tengah telunjuk kiri.'
     ],
     tips: 'Membentuk tanda tambah (+) atau huruf T kecil.',
@@ -238,7 +242,7 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'U': {
     letter: 'U',
-    description: 'Jari telunjuk dan jari tengah menunjuk ke atas secara rapat.',
+    description: 'Dua jari (telunjuk dan tengah) ditegakkan rapat menghadap ke atas.',
     category: 'One Hand',
     steps: [
       'Gunakan tangan kanan.',
@@ -249,7 +253,7 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'V': {
     letter: 'V',
-    description: 'Jari telunjuk dan jari tengah membentuk huruf V (simbol peace).',
+    description: 'Dua jari (telunjuk dan tengah) dibuka membentuk sudut menyerupai huruf V.',
     category: 'One Hand',
     steps: [
       'Gunakan tangan kanan.',
@@ -260,18 +264,19 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'W': {
     letter: 'W',
-    description: 'Kedua tangan saling mengaitkan jari-jari membentuk pola W.',
+    description: 'Kedua tangan mengangkat telunjuk masing-masing dan dibuka sedikit membentuk dua puncak.',
     category: 'Two Hands',
     steps: [
-      'Angkat kedua tangan dengan telapak menghadap ke depan.',
-      'Silangkan jari telunjuk, tengah, dan manis kedua tangan sehingga membentuk pola zig-zag W.'
+      'Angkat kedua tangan.',
+      'Tegakkan telunjuk kanan dan kiri.',
+      'Buka sedikit membentuk dua puncak.'
     ],
-    tips: 'Gunakan tiga jari utama dari masing-masing tangan.',
+    tips: 'Dua puncak melambangkan huruf W.',
     imagePath: '/images/bisindo/w.jpg'
   },
   'X': {
     letter: 'X',
-    description: 'Kedua jari telunjuk disilangkan membentuk tanda silang.',
+    description: 'Kedua jari telunjuk disilangkan tepat di depan dada membentuk tanda silang.',
     category: 'Two Hands',
     steps: [
       'Angkat kedua jari telunjuk.',
@@ -282,25 +287,26 @@ export const BISINDO_ALPHABET: Record<string, BisindoLetter> = {
   },
   'Y': {
     letter: 'Y',
-    description: 'Jempol and kelingking direntangkan, jari lainnya menekuk (simbol shaka).',
-    category: 'One Hand',
+    description: 'Telunjuk kiri tegak dengan bentuk V tangan kanan didekatkan membentuk percabangan.',
+    category: 'Two Hands',
     steps: [
-      'Gunakan tangan kanan.',
-      'Rentangkan jempol and kelingking sejauh mungkin.',
-      'Tekuk tiga jari tengah ke arah telapak tangan.'
+      'Tangan kiri: Angkat telunjuk tegak.',
+      'Tangan kanan: Bentuk huruf V (telunjuk dan tengah).',
+      'Silangkan atau dekatkan keduanya membentuk huruf Y.'
     ],
-    tips: 'Bentuk ini menyerupai percabangan pada huruf Y.',
+    tips: 'Percabangan terlihat jelas seperti huruf Y.',
     imagePath: '/images/bisindo/y.jpg'
   },
   'Z': {
     letter: 'Z',
-    description: 'Jari telunjuk menggambar pola zig-zag huruf Z di udara.',
+    description: 'Tangan kanan membentuk sudut tajam statis (seperti angka 7) yang menyerupai bentuk Z.',
     category: 'One Hand',
     steps: [
-      'Angkat jari telunjuk tangan kanan.',
-      'Gerakkan jari membentuk garis horizontal ke kanan, lalu diagonal ke kiri bawah, dan horizontal ke kanan lagi.'
+      'Gunakan tangan kanan.',
+      'Bentuk tangan menyerupai sudut tajam seperti angka 7.',
+      'Posisikan miring ke kanan.'
     ],
-    tips: 'Lakukan gerakan dengan tegas agar pola Z terlihat jelas.',
+    tips: 'Bentuk statis menyerupai huruf Z.',
     imagePath: '/images/bisindo/z.jpg'
   }
 };

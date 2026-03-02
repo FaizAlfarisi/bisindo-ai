@@ -116,7 +116,7 @@ const TestPage = () => {
   }, [prediction, testLetters, questionsAnswered, testStarted, handleNext]);
 
   const onNewLandmarks = useCallback((handsData: any) => sendLandmarks(handsData), [sendLandmarks]);
-  const { videoRef, canvasRef, isHandLandmarkerLoaded, error: webcamError, startDetection, stopDetection } = useWebcamAndHandDetection(onNewLandmarks, 150);
+  const { videoRef, canvasRef, isHandLandmarkerLoaded, startDetection, stopDetection, error: webcamError } = useWebcamAndHandDetection(onNewLandmarks, 150);
 
   useEffect(() => {
     if (isHandLandmarkerLoaded && testStarted) startDetection();
@@ -239,6 +239,12 @@ const TestPage = () => {
                       ))}
                    </div>
                 </div>
+
+                {(wsError || webcamError) && (
+                  <div className="text-[10px] font-black text-red-400 uppercase tracking-widest text-center">
+                    Engine Status: {wsError || webcamError ? 'Issues Detected' : 'Optimal'}
+                  </div>
+                )}
              </div>
           </div>
         )}

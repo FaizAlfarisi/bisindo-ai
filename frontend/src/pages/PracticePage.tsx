@@ -40,8 +40,15 @@ const PracticePage = () => {
     }
   }, [prediction, letter, saveProgress]);
 
+  // Reset states when target letter changes
+  useEffect(() => {
+    setProgressSaved(false);
+    lastSavedConfidenceRef.current = 0; 
+    setPrediction(null); // Clear previous prediction
+  }, [letter, setPrediction]);
+
   const onNewLandmarks = useCallback((handsData: any) => sendLandmarks(handsData), [sendLandmarks]);
-  const { videoRef, canvasRef, isHandLandmarkerLoaded, error: webcamError, startDetection, stopDetection } = useWebcamAndHandDetection(onNewLandmarks, 150);
+  const { videoRef, canvasRef, isHandLandmarkerLoaded, startDetection, stopDetection, error: webcamError } = useWebcamAndHandDetection(onNewLandmarks, 150);
 
   useEffect(() => {
     if (isHandLandmarkerLoaded) startDetection();
@@ -130,6 +137,12 @@ const PracticePage = () => {
               {progressSaved && (
                 <div className="bg-green-50 p-6 rounded-3xl border border-green-100 text-center font-black text-green-600 text-xs uppercase tracking-widest">
                    Progress Saved Successfully
+                </div>
+              )}
+
+              {(wsError || webcamError) && (
+                <div className="bg-red-50 p-6 rounded-3xl border border-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest">
+                   Error: {wsError || webcamError}
                 </div>
               )}
            </div>
