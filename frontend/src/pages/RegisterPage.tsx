@@ -23,15 +23,11 @@ const RegisterPage = () => {
     }
 
     try {
+      console.log(`Attempting to register at: ${API_BASE_URL}/api/auth/register`);
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
@@ -39,11 +35,13 @@ const RegisterPage = () => {
         throw new Error(errorData.detail || 'Registration failed.');
       }
 
-      // Registration successful, redirect to login page
       navigate('/login?registrationSuccess=true');
-
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+      if (err.message === 'Failed to fetch') {
+        setError("Cannot connect to server. The backend might be waking up or the API URL is incorrect.");
+      } else {
+        setError(err.message || 'An unexpected error occurred.');
+      }
       console.error('Registration error:', err);
     } finally {
       setLoading(false);
@@ -51,65 +49,77 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-800 p-4">
-      <h1 className="text-4xl font-bold mb-6">Register</h1>
-      <form onSubmit={handleRegister} className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        <div className="mb-4">
-          <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
-            Username:
-          </label>
-          <input
-            type="text"
-            id="username"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            disabled={loading}
-          />
+    <div className="bg-gray-50/50 min-h-screen flex items-center justify-center p-6">
+      <div className="bg-white p-10 md:p-16 rounded-[3rem] shadow-2xl border border-gray-100 w-full max-w-xl">
+        <div className="text-center mb-12">
+          <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-200">
+            <span className="text-white font-black text-3xl">B</span>
+          </div>
+          <h1 className="text-4xl font-black text-gray-900 mb-2">Create Account</h1>
+          <p className="text-gray-500 font-medium">Join the BISINDO learning community today.</p>
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
-            Password:
-          </label>
-          <input
-            type="password"
-            id="password"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-        <div className="mb-6">
-          <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mb-2">
-            Confirm Password:
-          </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-        <div className="flex items-center justify-between">
+
+        <form onSubmit={handleRegister} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-100 p-4 rounded-2xl text-red-600 text-sm font-bold text-center">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Username</label>
+            <input
+              type="text"
+              className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-gray-700"
+              placeholder="Pick a unique name"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Password</label>
+            <input
+              type="password"
+              className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-gray-700"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Confirm Password</label>
+            <input
+              type="password"
+              className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-gray-700"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
+
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-3xl font-black text-xl shadow-xl shadow-blue-200 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loading}
           >
-            {loading ? 'Registering...' : 'Register'}
+            {loading ? 'Processing...' : 'Register Now'}
           </button>
-          <Link to="/login" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-            Already have an account? Login
-          </Link>
+        </form>
+
+        <div className="mt-10 text-center">
+          <p className="text-gray-500 font-bold text-sm">
+            Already have an account? <Link to="/login" className="text-blue-600 hover:underline ml-1">Log In</Link>
+          </p>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
