@@ -18,12 +18,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Security: Only allow specific hosts
-app.add_middleware(
-    TrustedHostMiddleware, 
-    allowed_hosts=["localhost", "127.0.0.1", "*.onrender.com", "*.vercel.app"]
-)
-
 # Configure CORS
 origins = [
     "http://localhost",
