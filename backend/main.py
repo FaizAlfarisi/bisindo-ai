@@ -46,9 +46,17 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), "app", "ai", "bisindo_model
 # --- Database Startup Event ---
 @app.on_event("startup")
 def on_startup():
-    create_db_and_tables()
+    print("Starting up application...")
+    try:
+        create_db_and_tables()
+        print("Database tables verified/created.")
+    except Exception as e:
+        print(f"Database connection failed during startup: {e}")
+        print("Application will continue to start, but DB features may fail.")
+        
     try:
         load_bisindo_model(MODEL_PATH)
+        print("AI Model loaded successfully.")
     except Exception as e:
         print(f"Error loading model: {e}")
 
