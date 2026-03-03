@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# AI Data & Notebooks
+main_program.ipynb
+bisindo images/
+backend/bisindo.db
+.devdbrc
+
+# Local env
+.env
+frontend/.env

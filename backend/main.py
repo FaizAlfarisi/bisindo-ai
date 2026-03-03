@@ -23,7 +23,7 @@ origins = [
     "http://localhost",
     "http://localhost:5173", 
     "http://127.0.0.1:5173",
-    os.getenv("FRONTEND_URL", "*"), # Allow Vercel URL from Env Var
+    "https://bisindo-ai.vercel.app", # Domain Vercel Anda
 ]
 
 app.add_middleware(
