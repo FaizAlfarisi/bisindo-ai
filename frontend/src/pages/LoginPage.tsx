@@ -52,12 +52,10 @@ const LoginPage = () => {
       window.dispatchEvent(new Event('storage'));
       navigate('/dashboard');
     } catch (err: any) {
-      console.error("Login error:", err);
-      if (err.message === 'Failed to fetch') {
-        setError('Cannot connect to server. Please check your internet or if the backend is waking up (Render Free Tier might take 1 minute).');
-      } else {
-        setError(err.message || 'Login failed.');
-      }
+      console.error("Login detailed error:", err);
+      // Menampilkan error raw untuk debugging
+      const errorMessage = err.message || JSON.stringify(err);
+      setError(`DEBUG ERROR: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
